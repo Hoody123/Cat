@@ -13,7 +13,9 @@ public partial class all_aspx : MPPage
     {
         Ajax();
         MPData.images = GetData();
-        Title = "";
+        Title = "最新图片_喵帕斯";
+        MetaKeywords = "动漫 二次元 图片 图包 ";
+        MetaDescription = "喵帕斯是一个专注于动漫图片的收集和分享的网站";
     }
 
     void Ajax()
@@ -23,7 +25,7 @@ public partial class all_aspx : MPPage
             try
             {
                 int max = Tools.GetInt32FromRequest(Request.QueryString["max"]);
-                Response.Write(JSON.Stringify(GetData(max)));
+                Response.Write(Tools.JSONStringify(GetData(max)));
                 Response.End();
             }
             catch { }
@@ -41,7 +43,7 @@ public partial class all_aspx : MPPage
         {
             try
             {
-                dataList.Add(JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), user));
+                dataList.Add(new JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), user));
             }
             catch { }
         }

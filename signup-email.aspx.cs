@@ -36,11 +36,11 @@ public partial class signup_email : MPPage
 
                 DB.SExecuteNonQuery("delete from signup_email where token=?", token);
 
-                Response.Write(JSON.Stringify(new { code = 0, msg = "ok" }));
+                Response.Write(Tools.JSONStringify(new { code = 0, msg = "ok" }));
             }
             catch (MiaopassException exception)
             {
-                Response.Write(JSON.Stringify(new { code = exception.Code, msg = exception.Message }));
+                Response.Write(Tools.JSONStringify(new { code = exception.Code, msg = exception.Message }));
             }
 
             Response.End();

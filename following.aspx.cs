@@ -25,7 +25,7 @@ public partial class following : MPPage
             try
             {
                 int max = Tools.GetInt32FromRequest(Request.QueryString["max"]);
-                Response.Write(JSON.Stringify(GetData(max)));
+                Response.Write(Tools.JSONStringify (GetData(max)));
                 Response.End();
             }
             catch { }
@@ -43,7 +43,7 @@ public partial class following : MPPage
         {
             try
             {
-                dataList.Add(JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])),user));
+                dataList.Add(new JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])),user));
             }
             catch { }
         }

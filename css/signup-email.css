@@ -452,7 +452,6 @@ table {
   padding-left: 60px;
 }
 .image-view .info-piece .add-comment {
-  margin: 0 -15px;
   padding: 15px;
   border-top: 1px solid #ebebeb;
 }
@@ -468,7 +467,7 @@ table {
   width: auto;
 }
 .image-view .info-piece .add-comment .new-comment textarea {
-  width: 601px;
+  width: 605px;
   height: 60px;
   border: 1px solid #cccccc;
   border-radius: 3px;

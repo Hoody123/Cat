@@ -1,8 +1,7 @@
-﻿/// <reference path="../main.js" />
-/// <reference path="../Format/User.js" />
+﻿/// <reference path="../Format/User.js" />
 MPWidget.ImageView = {};
 MPWidget.ImageView.New = function (imageDetail)
-{
+{    
     var fuser = MPFormat.User.New(imageDetail.user);
     var strVar = "";
     strVar += "<div class=\"image-view\">";
@@ -17,6 +16,47 @@ MPWidget.ImageView.New = function (imageDetail)
     strVar += "                <img src=\"{0}\" />".Format(imageHost + "/" + imageDetail.file.hash + "_fw658");
     strVar += "            <\/div>";
     strVar += "            <div class=\"tool-bar-bottom\">";
+    strVar += "                <div class=\"clear\"><\/div>";
+    strVar += "            <\/div>";
+    strVar += "        <\/div>";
+    strVar += "          <div class=\"info-piece piece\">";
+    strVar += "                <div class=\"info\">";
+    strVar += "                    <a class=\"avt\" href=\"{0}\">".Format(fuser.Home());
+    strVar += "                        <img src=\"{0}\" />".Format(fuser.Avt());
+    strVar += "                    <\/a>";
+    strVar += "                    <div class=\"info-main\">";
+    strVar += "                        <a class=\"name\" href=\"{1}\">{0}<\/a>".Format(fuser.Name(), fuser.Home());
+    strVar += "                    <\/div>";
+    strVar += "                    <div class=\"sub\">";
+    strVar += "                        收集于 {0}".Format(imageDetail.time);
+    strVar += "                    <\/div>";
+    strVar += "                <\/div>";
+    if (imageDetail.description != "")
+    {
+        strVar += "                <div class=\"description\">{0}<\/div>".Format(imageDetail.description);
+    }
+    strVar += "                <div class=\"comments\">";
+    var n = imageDetail.comments.length;
+    for (var i = 0; i < n; i++)
+    {
+        var fuser1 = MPFormat.User.New(imageDetail.comments[i].user);
+        strVar += "                    <div class=\"comment\">";
+        strVar += "                        <a class=\"avt\" href=\"{0}\">".Format(fuser1.Home());
+        strVar += "                            <img src=\"{0}\" />".Format(fuser1.Avt());
+        strVar += "                        <\/a>";
+        strVar += "                        <a class=\"name\">{0}<\/a>".Format(fuser1.Name());
+        strVar += "                        <div class=\"text\">{0}<\/div>".Format(imageDetail.comments[i].text);
+        strVar += "                    <\/div>";
+    }
+    strVar += "                <div class=\"add-comment\">";
+    strVar += "                    <a class=\"avt\" href=\"{0}\">".Format(fuser.Home());
+    strVar += "                        <img src=\"{0}\" />".Format(fuser.Avt());
+    strVar += "                    <\/a>";
+    strVar += "                    <div class=\"new-comment\">";
+    strVar += "                        <textarea placeholder=\"请在这里输入评论内容\" ><\/textarea>";
+    strVar += "                    <\/div>";
+    strVar += "                    <div class=\"submit\">添加评论<\/div>";
+    strVar += "                <\/div>";
     strVar += "                <div class=\"clear\"><\/div>";
     strVar += "            <\/div>";
     strVar += "        <\/div>";

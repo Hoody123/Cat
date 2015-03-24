@@ -47,7 +47,7 @@ public partial class user_aspx : MPPage
                     var res = DB.SExecuteReader("select id from image where userid=? and id<? order by id desc limit ?", pageUser.ID, max, limit);
                     foreach (var item in res)
                     {
-                        datas.Add(JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                        datas.Add(new JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                     }
                 }
                 break;
@@ -60,7 +60,7 @@ public partial class user_aspx : MPPage
                                 var res = DB.SExecuteReader("select info from praise where userid=? and type=? and id<? order by id desc limit ?", pageUser.ID, MPPraiseTypes.Package, max, limit);
                                 foreach (var item in res)
                                 {
-                                    datas.Add(JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                                    datas.Add(new JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                                 }
                             }
                             break;
@@ -69,7 +69,7 @@ public partial class user_aspx : MPPage
                                 var res = DB.SExecuteReader("select info from praise where userid=? and type=? and id<? order by id desc limit ?", pageUser.ID, MPPraiseTypes.Image, max, limit);
                                 foreach (var item in res)
                                 {
-                                    datas.Add(JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                                    datas.Add(new JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                                 }
                             }
                             break;
@@ -85,7 +85,7 @@ public partial class user_aspx : MPPage
                                 var res = DB.SExecuteReader("select info from following where userid=? and type=? and id<? order by id desc limit ?", pageUser.ID, MPFollowingTypes.Package, max, limit);
                                 foreach (var item in res)
                                 {
-                                    datas.Add(JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                                    datas.Add(new JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                                 }
                             }
                             break;
@@ -94,7 +94,7 @@ public partial class user_aspx : MPPage
                                 var res = DB.SExecuteReader("select info from following where userid=? and type=? and id<? order by id desc limit ?", pageUser.ID, MPFollowingTypes.User, max, limit);
                                 foreach (var item in res)
                                 {
-                                    datas.Add(JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                                    datas.Add(new JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                                 }
                             }
                             break;
@@ -106,7 +106,7 @@ public partial class user_aspx : MPPage
                     var res = DB.SExecuteReader("select userid from following where info=? and type=? and id<? order by id desc limit ?", pageUser.ID, MPFollowingTypes.User, max, limit);
                     foreach (var item in res)
                     {
-                        datas.Add(JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                        datas.Add(new JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                     }
                 }
                 break;
@@ -115,7 +115,7 @@ public partial class user_aspx : MPPage
                     var res = DB.SExecuteReader("select id from package where userid=? and id<? order by id desc limit 10", pageUser.ID, max);
                     foreach (var item in res)
                     {
-                        datas.Add(JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                        datas.Add(new JSON.PackageDetail(new MPPackage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                     }
                 }
                 break;
@@ -123,15 +123,18 @@ public partial class user_aspx : MPPage
 
         if (Request.QueryString["ajax"] != null)
         {
-            Response.Write(JSON.Stringify(datas));
+            Response.Write(Tools.JSONStringify(datas));
             Response.End();
             return;
         }
 
-        MPData.page_user = JSON.UserDetail(pageUser, Session["user"] as MPUser);
+        MPData.page_user =new JSON.UserDetail(pageUser, Session["user"] as MPUser);
         MPData.sub1 = sub1;
         MPData.sub2 = sub2;
         MPData.datas = datas;
+        Title = string.Format("{0}的主页_喵帕斯", pageUser.Name);
+        MetaKeywords = string.Format("{0}收集的图片,图包",pageUser.Name);
+        MetaDescription = pageUser.Description;
     }
 
 }

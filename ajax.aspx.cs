@@ -214,7 +214,7 @@ public partial class ajax : System.Web.UI.Page
 
                         MPPackage package = new MPPackage(packageId);
                         MPFile file = new MPFile(md5);
-                        MPImage.Create(package.ID, file.ID,user.ID,MPImageFromTypes.Upload, 0, "", description);
+                        MPImage.Create(package.ID, file.ID, user.ID, MPImageFromTypes.Upload, 0, "", description);
                         MPImage image = new MPImage(packageId, file.ID);
 
                         int begin = 0;
@@ -300,14 +300,14 @@ public partial class ajax : System.Web.UI.Page
                 #region praise-image 赞图片
                 case "praise-image":
                     {
-                        var user= CheckLogin();
+                        var user = CheckLogin();
                         var image = new MPImage(Convert.ToInt32(Tools.GetInt32FromRequest(Request.Form["image_id"])));
 
-                        DB.SExecuteNonQuery("insert ignore into praise (userid,type,info) values (?,?,?)",user.ID,MPPraiseTypes.Image,image.ID);
+                        DB.SExecuteNonQuery("insert ignore into praise (userid,type,info) values (?,?,?)", user.ID, MPPraiseTypes.Image, image.ID);
 
                         Response.Write(JsonConvert.SerializeObject(new { code = 0, msg = "ok" }));
                     }
-                    break; 
+                    break;
                 #endregion
                 #region unpraise-image 取消赞图片
                 case "unpraise-image":
@@ -344,9 +344,45 @@ public partial class ajax : System.Web.UI.Page
                         var source = Tools.GetStringFromRequest(Request.Form["source"]);
                         var from = Tools.GetStringFromRequest(Request.Form["from"]);
 
-                        DB.SExecuteNonQuery("insert into task_download(packageid,userid,source,`from`,description) values (?,?,?,?,?)", package.ID,user.ID,source,from,description);
+                        DB.SExecuteNonQuery("insert into task_download(packageid,userid,source,`from`,description) values (?,?,?,?,?)", package.ID, user.ID, source, from, description);
 
                         Response.Write(JsonConvert.SerializeObject(new { code = 0, msg = "ok" }));
+                    }
+                    break;
+                #endregion
+                #region add-comment 添加评论
+                case "add-comment":
+                    {
+                        DateTime lastTime = Convert.ToDateTime(Session["lastAddCommentTime"]);
+                        DateTime now = DateTime.Now;
+                        if ((now - lastTime).TotalSeconds < 20)
+                        {
+                            throw new MiaopassException("发表评论过于频繁,请于20秒后重试");
+                        }
+                        var user = CheckLogin();
+                        int imageId = Tools.GetInt32FromRequest(Request.Form["image_id"]);
+                        string text = Tools.GetStringFromRequest(Request.QueryString["text"]);
+
+                        var image = new MPImage(imageId);
+
+                        int commentId = MPComment.Create(image.ID, user.ID, text);
+                        Response.Write(Tools.JSONStringify(new { code = 0, msg = "ok", id = commentId }));
+                    }
+                    break;
+                #endregion
+                #region delete-comment 删除评论
+                case "delete-comment":
+                    {
+                        var user = CheckLogin();
+                        int commentId = Tools.GetInt32FromRequest(Request.Form["id"]);
+                        var comment = new MPComment(commentId);
+                        if(comment.UserID!=user.ID)
+                        {
+                            throw new MiaopassException("无操作权限");
+                        }
+
+                        DB.SExecuteNonQuery("delete from comment_mention where commentid=?",commentId);
+                        DB.SExecuteNonQuery("delete from comment where id=?", commentId);
                     }
                     break;
                 #endregion
@@ -356,5 +392,7 @@ public partial class ajax : System.Web.UI.Page
         {
             Response.Write(JsonConvert.SerializeObject(new { code = exception.Code, msg = exception.Message }));
         }
+
+        Response.End();
     }
 }

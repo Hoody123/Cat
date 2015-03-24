@@ -7,7 +7,6 @@ using System.Web.UI.WebControls;
 
 public partial class package_aspx : MPPage
 {
-
     protected void Page_Load(object sender, EventArgs e)
     {
         MPPackage package = null;
@@ -36,7 +35,7 @@ public partial class package_aspx : MPPage
                     var res = DB.SExecuteReader("select userid from following where type=? and info=? and id<? order by id limit ?", MPFollowingTypes.Package, package.UserID, max, limit);
                     foreach (var item in res)
                     {
-                        list.Add(JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                        list.Add(new JSON.UserDetail(new MPUser(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                     }
                 }
                 break;
@@ -47,14 +46,14 @@ public partial class package_aspx : MPPage
                     {
                         foreach (var item in res)
                         {
-                            list.Add(JSON.Image(new MPImage(Convert.ToInt32(item[0]))));
+                            list.Add(new JSON.Image(new MPImage(Convert.ToInt32(item[0]))));
                         }
                     }
                     else
                     {
                         foreach (var item in res)
                         {
-                            list.Add(JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
+                            list.Add(new JSON.ImageDetail(new MPImage(Convert.ToInt32(item[0])), Session["user"] as MPUser));
                         }
                     }
                 }
@@ -64,12 +63,17 @@ public partial class package_aspx : MPPage
 
         if(Request.QueryString["ajax"]!=null)
         {
-            Response.Write(JSON.Stringify(list));
+            Response.Write(Tools.JSONStringify (list));
             Response.End();
             return;
         }
 
-        MPData.package = JSON.PackageDetail(package, Session["user"] as MPUser);
+        var packageDetail=new JSON.PackageDetail(package, Session["user"] as MPUser);
+        MPData.package =packageDetail;
         MPData.datas = list;
+        string title = package.Title.Length > 20 ? package.Title.Substring(0, 20) + "..." : package.Title;
+        Title = string.Format("{0}@{1}收集_喵帕斯", title, packageDetail.user.name);
+        MetaDescription = package.Description;
+        MetaKeywords = package.Title;
     }
 }

@@ -8,156 +8,204 @@ using System.Dynamic;
 /// <summary>
 /// JSON 的摘要说明
 /// </summary>
-public static class JSON
+namespace JSON
 {
-    public static object User(MPUser user)
+    public class User
     {
-        return new
+        public int id { get; set; }
+        public string name { get; set; }
+        public bool default_head { get; set; }
+        public User(MPUser user)
         {
-            id = user.ID,
-            name = user.Name,
-            default_head = user.DefaultHead
-        };
+            id = user.ID;
+            name = user.Name;
+            default_head = user.DefaultHead;
+        }
+    }
+    public class Mention
+    {
+        public int id { get; set; }
+        public int pos { get; set; }
+        public int len { get; set; }
+        public Mention(MPCommentMention mention)
+        {
+            id = mention.UserID;
+            pos = mention.Position;
+            len = mention.Length;
+        }
+    }
+    public class Comment
+    {
+        public int id { get; set; }
+        public JSON.User user { get; set; }
+        public string text { get; set; }
+        public string time { get; set; }
+        public List<JSON.Mention> mentions { get; set; }
+        public Comment(MPComment comment)
+        {
+            id = comment.ID;
+            user = new JSON.User(new MPUser(comment.UserID));
+            text = comment.Text;
+            time = comment.CreatedTime.ToString();
+            mentions = new List<JSON.Mention>();
+            var res = DB.SExecuteReader("select id from comment_mention where commentid=?", id);
+            foreach (var item in res)
+            {
+                mentions.Add(new JSON.Mention(new MPCommentMention(Convert.ToInt32(item[0]))));
+            }
+
+        }
     }
 
-    public static object UserDetail(MPUser user, MPUser currentUser)
+    public class UserDetail
     {
-        int followsCount = 0;
-        int followersCount = 0;
-        int packagesCount = 0;
-        int imagesCount = 0;
-        int praiseCount = 0;
-        bool followed = false;
+        public int id { get; set; }
+        public string name { get; set; }
+        public bool default_head { get; set; }
+        public int follows_count { set; get; }
+        public int followers_count { set; get; }
+        public int packages_count { set; get; }
+        public int images_count { set; get; }
+        public int praise_count { set; get; }
+        public bool followed { set; get; }
 
-        followsCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from following where userid=?", user.ID));
-        followersCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from following where type=? and info=?", MPFollowingTypes.User, user.ID));
-        packagesCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from package where userid=?", user.ID));
-        imagesCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from image where userid=?", user.ID));
-        praiseCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from praise where userid=?", user.ID));
-
-        if (currentUser != null && currentUser.ID != user.ID)
+        public UserDetail(MPUser user, MPUser currentUser)
         {
-            var res = DB.SExecuteScalar("select userid from following where userid=? and type=? and info=?", currentUser.ID, MPFollowingTypes.User, user.ID);
-            if (res != null)
-                followed = true;
+            id = user.ID;
+            name = user.Name;
+            default_head = user.DefaultHead;
+            follows_count = Convert.ToInt32(DB.SExecuteScalar("select count(*) from following where userid=?", user.ID));
+            followers_count = Convert.ToInt32(DB.SExecuteScalar("select count(*) from following where type=? and info=?", MPFollowingTypes.User, user.ID));
+            packages_count = Convert.ToInt32(DB.SExecuteScalar("select count(*) from package where userid=?", user.ID));
+            images_count = Convert.ToInt32(DB.SExecuteScalar("select count(*) from image where userid=?", user.ID));
+            praise_count = Convert.ToInt32(DB.SExecuteScalar("select count(*) from praise where userid=?", user.ID));
+
+            followed = false;
+            if (currentUser != null && currentUser.ID != user.ID)
+            {
+                var res = DB.SExecuteScalar("select userid from following where userid=? and type=? and info=?", currentUser.ID, MPFollowingTypes.User, user.ID);
+                if (res != null)
+                    followed = true;
+            }
         }
 
-        return new
-        {
-            id = user.ID,
-            name = user.Name,
-            default_head = user.DefaultHead,
-            follows_count = followsCount,
-            followers_count = followersCount,
-            packages_count = packagesCount,
-            images_count = imagesCount,
-            praise_count = praiseCount,
-            followed = followed
-        };
     }
 
-    public static object File(MPFile file)
+    public class File
     {
-        return new
+        public string hash { get; set; }
+        public int width { get; set; }
+        public int height { get; set; }
+
+        public File(MPFile file)
         {
-            hash = file.MD5,
-            width = file.Width,
-            height = file.Height
-        };
+            hash = file.MD5;
+            width = file.Width;
+            height = file.Height;
+        }
     }
 
-    public static object Package(MPPackage package)
+    public class Package
     {
-        return new
+        public int id { get; set; }
+        public string title { get; set; }
+        public Package(MPPackage package)
         {
-            id = package.ID,
-            title = package.Title
-        };
+            id = package.ID;
+            title = package.Title;
+        }
+    }
+    public class Image
+    {
+        public int id { get; set; }
+        public JSON.File file { get; set; }
+        public Image(MPImage image)
+        {
+            id = image.ID;
+            file = new JSON.File(new MPFile(image.FileID));
+        }
+
     }
 
-    public static object PackageDetail(MPPackage package, MPUser currentUser)
+    public class PackageDetail
     {
-        dynamic result = new ExpandoObject();
-        result.id = package.ID;
-        result.title = package.Title;
-        result.description = package.Description;
+        public int id { get; set; }
+        public JSON.User user { get; set; }
+        public string title { get; set; }
+        public string description { get; set; }
+        public List<JSON.Image> thumbs { get; set; }
+        public int imageCount { get; set; }
+        public int followerCount { get; set; }
+        public bool praised { get; set; }
+        public bool followed { get; set; }
 
-        var thumbs = new List<object>();
+        public PackageDetail(MPPackage package, MPUser currentUser)
         {
+            id = package.ID;
+            title = package.Title;
+            description = package.Description;
+            thumbs = new List<Image>();
             var res = DB.SExecuteReader("select image.id from image left join package on image.id=package.coverid where packageid=? order by coverid desc ,image.id desc limit 4", package.ID);
             foreach (var item in res)
             {
-                thumbs.Add(JSON.Image(new MPImage(Convert.ToInt32(item[0]))));
+                thumbs.Add(new JSON.Image(new MPImage(Convert.ToInt32(item[0]))));
+            }
+            imageCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from image where packageid=?", package.ID));
+            followerCount = Convert.ToInt32(DB.SExecuteScalar("select count(*) from following where type=? and info=?", MPFollowingTypes.Package, package.ID));
+            user = new JSON.User(new MPUser(package.UserID));
+            if (currentUser != null && currentUser.ID != user.id)
+            {
+                praised = false;
+                followed = false;
+
+                if (DB.SExecuteScalar("select userid from praise where userid=? and type=? and info=?", currentUser.ID, MPPraiseTypes.Package, package.ID) != null)
+                {
+                    praised = true;
+                }
+                if (DB.SExecuteScalar("select userid from following where userid=? and type=? and info=?", currentUser.ID, MPFollowingTypes.Package, package.ID) != null)
+                {
+                    praised = true;
+                }
             }
         }
-        result.thumbs = thumbs;
+    }
 
-        var imageCount = DB.SExecuteScalar("select count(*) from image where packageid=?", package.ID);
-        var followerCount = DB.SExecuteScalar("select count(*) from following where type=? and info=?", MPFollowingTypes.Package, package.ID);
+    public class ImageDetail
+    {
+        public int id { get; set; }
+        public JSON.Package package { get; set; }
+        public JSON.File file { get; set; }
+        public JSON.User user { get; set; }
+        public string description { get; set; }
+        public bool praised { get; set; }
+        public List<JSON.Comment> comments { get; set; }
+        public string time { get; set; }
 
-        result.imageCount = Convert.ToInt32(imageCount);
-        result.followerCount = Convert.ToInt32(followerCount);
-
-        var user = new MPUser(package.UserID);
-        result.user = User(user);
-
-        if (currentUser != null && currentUser.ID != user.ID)
+        public ImageDetail(MPImage image, MPUser currentUser)
         {
-            bool praised = false;
-            bool followed = false;
-
-            if (DB.SExecuteScalar("select userid from praise where userid=? and type=? and info=?", currentUser.ID, MPPraiseTypes.Package, package.ID) != null)
+            id = image.ID;
+            package = new JSON.Package(new MPPackage(image.PackageID));
+            file = new JSON.File(new MPFile(image.FileID));
+            user = new JSON.User(new MPUser(image.UserID));
+            description = image.Description;
+            praised = false;
+            if (currentUser != null)
             {
-                praised = true;
-            }
-            if (DB.SExecuteScalar("select userid from following where userid=? and type=? and info=?", currentUser.ID, MPFollowingTypes.Package, package.ID) != null)
-            {
-                praised = true;
+                if (DB.SExecuteScalar("select userid from praise where userid=? and type=? and info=?", currentUser.ID, MPPraiseTypes.Image, image.ID) != null)
+                {
+                    praised = true;
+                }
             }
 
-            result.praised = praised;
-            result.followed = followed;
+            comments = new List<Comment>();
+            var res = DB.SExecuteReader("select id from comment where imageid=?", image.ID);
+            foreach (var item in res)
+            {
+                comments.Add(new JSON.Comment(new MPComment(Convert.ToInt32(item[0]))));
+            }
+
+            time = image.CreatedTime.ToString();
         }
-
-        return result;
-    }
-
-    public static object ImageDetail(MPImage image, MPUser currentUser)
-    {
-        MPPackage package = new MPPackage(image.PackageID);
-        MPFile file = new MPFile(image.FileID);
-        MPUser packageUser = new MPUser(package.UserID);
-
-        bool praised = false;
-        if (currentUser != null)
-        {
-            if (DB.SExecuteScalar("select userid from praise where userid=? and type=? and info=?", currentUser.ID, MPPraiseTypes.Image, image.ID) != null)
-            {
-                praised = true;
-            }
-        }
-
-        return new
-        {
-            id = image.ID,
-            user = User(packageUser),
-            package = Package(package),
-            file = File(file),
-            description = image.Description,
-            praised = praised
-        };
-    }
-
-    public static object Image(MPImage image)
-    {
-        return new
-        {
-            id = image.ID,
-            file = File(new MPFile(image.FileID))
-        };
-    }
-    public static string Stringify(object obj)
-    {
-        return JsonConvert.SerializeObject(obj);
     }
 }
+

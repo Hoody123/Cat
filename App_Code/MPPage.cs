@@ -21,12 +21,13 @@ public class MPPage : System.Web.UI.Page
         var user = Session["user"] as MPUser;
         if (user != null)
         {
-            MPData.user = JSON.User(user);
+            MPData.user =new JSON.User(user);
         }
         else
         {
-            MPData.user = JSON.User(new MPUser(0));
+            MPData.user = new JSON.User(new MPUser(0));
         }
+        
     }
     
 }

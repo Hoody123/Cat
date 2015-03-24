@@ -18,7 +18,7 @@
         var page = Page as MPPage;        
     %>
     <script type="text/javascript">
-        MPData=<%=JSON.Stringify(page.MPData)%>
+        MPData=<%=Tools.JSONStringify(page.MPData)%>
     </script>
 </head>
 <body>

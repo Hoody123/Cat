@@ -15,6 +15,4 @@ $(function ()
     var description = image.description.length > 20 ? image.description.substring(0, 20) + "..." : image.description;
     var username = image.user.name;
     var packagetitle = image.package.title;
-
-    document.title = description + "@" + username + "收集到" + packagetitle + "_喵帕斯";
 });

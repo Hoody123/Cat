@@ -10,7 +10,6 @@ public class MPComment
     public int UserID { get; set; }
     public string Text { get; set; }
     public DateTime CreatedTime { get; set; }
-    public List<MPCommentMention> Mentions { get; set; }
     public MPComment(int id)
     {
         var res = DB.SExecuteReader("select id,imageid,userid,`text`,createdtime from comment where id=?", id);
@@ -25,16 +24,9 @@ public class MPComment
         UserID = Convert.ToInt32(row[2]);
         Text = (string)row[3];
         CreatedTime = Convert.ToDateTime(row[4]);
-
-        Mentions = new List<MPCommentMention>();
-        var res1 = DB.SExecuteReader("select id from comment_mention where commentid=?", ID);
-        foreach (var item in res1)
-        {
-            Mentions.Add(new MPCommentMention(Convert.ToInt32(item[0])));
-        }
     }
 
-    public static void Create(int imageid, int userid, string text)
+    public static int Create(int imageid, int userid, string text)
     {
         int id = DB.SInsert("insert into comment (imageid,userid,`text`) values (?,?,?)", imageid, userid, text);
         int pos = 0;
@@ -57,6 +49,7 @@ public class MPComment
 
             pos = end + 1;
         }
+        return id;
     }
 }
 

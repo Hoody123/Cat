@@ -9,6 +9,7 @@ using System.Security.Cryptography;
 using System.Configuration;
 using System.Drawing;
 using System.Drawing.Imaging;
+using Newtonsoft.Json;
 
 public static class Tools
 {
@@ -16,6 +17,10 @@ public static class Tools
     public static string Host = ConfigurationManager.AppSettings["Host"];
     public static string MiaopassString = " - 喵帕斯~(*´▽｀)ノ";
 
+    public static string JSONStringify(object obj)
+    {
+        return JsonConvert.SerializeObject(obj);
+    }
     public static byte[] Md5(string str)
     {
         var buffer = Encoding.UTF8.GetBytes(str);

@@ -2,10 +2,9 @@
 
 <asp:Content runat="server" ContentPlaceHolderID="head">
     <script>
-        $(function ()
-        {
-            var frame = MPWidget.Frame.New();
-            $("body").append(frame);
-        })
     </script>
+</asp:Content>
+
+<asp:Content runat="server" ContentPlaceHolderID="body">
+    <%=DateTime.Now.ToString() %>
 </asp:Content>

@@ -1,7 +1,7 @@
 ﻿/// <reference path="Widget/Image.js" />
-/// <reference path="Widget/Image.js" />
 /// <reference path="jquery.js" />
 /// <reference path="carhartl-jquery-cookie-92b7715/jquery.cookie.js" />
+/// <reference path="config.js" />
 
 String.prototype.Format = function (arg1, arg2) {
     var args;
