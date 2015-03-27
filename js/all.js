@@ -10,6 +10,7 @@ $(function ()
 
     var n = MPData.images.length;
     var fall1 = MPWaterFall.New($(window), waterfall, 4, 236, 6, 6, 6, 6);
+    fall1.Resize();
     fall1.onBottom = function ()
     {
         fall1.BeginUpdate();

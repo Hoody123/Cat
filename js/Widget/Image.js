@@ -116,10 +116,8 @@ MPWidget.Image.Bind = function ()
                     box.onOK = function () {
                         dialog.Close();
                     }
-                    //转存成功后的处理,默认提示成功后一秒钟关闭
                 }
             }, "json");
-            //进行转存,见ajax文档```````````
         };
     }
 

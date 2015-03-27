@@ -120,7 +120,7 @@ public class MPUser
                 Initialize("email=?", str);
                 break;
             case MPUserConstructTypes.Username:
-                Initialize("username=?", str);
+                Initialize("name=?", str);
                 break;
         }
 

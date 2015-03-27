@@ -116,7 +116,7 @@ MPCreateImageDialog =//创建图片
                         option.text(filterSearch.val());
                         option.attr("data-package-id", data.packageid);
                         select.append(option);//将新的选项添加到select中
-
+                        dropListHide();
                         dropList.hide();
                     }
                     else {

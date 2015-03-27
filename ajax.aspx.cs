@@ -361,7 +361,7 @@ public partial class ajax : System.Web.UI.Page
                         }
                         var user = CheckLogin();
                         int imageId = Tools.GetInt32FromRequest(Request.Form["image_id"]);
-                        string text = Tools.GetStringFromRequest(Request.QueryString["text"]);
+                        string text = Tools.GetStringFromRequest(Request.Form["text"]);
 
                         var image = new MPImage(imageId);
 
